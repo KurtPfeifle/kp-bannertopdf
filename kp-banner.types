@@ -1,0 +1,11 @@
+# This file should be placed into '/usr/share/cups/mime/'.
+# For the format of the following lines, see existing 'mime.types' in the same directory
+
+application/vnd.cups-banner	string(0,'#CUPS-BANNER') \
+                                string(0,'#KP-BANNER') \
+                                contains(0,26,'#CUPS-BANNER') \
+                                contains(0,26,'#KP-BANNER')
+# In other words: we support files which have...
+#    .... either '#CUPS-BANNER' on the first two lines,
+#    .... or '#KP-BANNER' on the first two lines,
+#    .... or both (but all within the first 26 bytes!)
