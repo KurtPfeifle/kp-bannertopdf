@@ -1,6 +1,17 @@
 
 
 Code is working on the command line, but not yet been thoroughly tested.
+
+Testing happened on the command line with this command:
+
+     ./kp-bannertopdf           \
+            888888              \
+            kp                  \
+            "KP-Banner-Test"    \
+            13                  \
+            "media=yellow sides=two-sided finishings=3 markdown=false job-originating-host-name=MacBook" \
+            reference-banner
+
 There are some 'xdg-open' commands to serve for debugging.
 These will go away when in production.
 
