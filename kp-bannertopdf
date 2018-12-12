@@ -1,0 +1,155 @@
+#!/bin/bash
+#
+# /usr/lib/cups/filter/kp-bannertopdf
+#
+# (c) Dezember 2018  Kurt Pfeifle <pfeifle@gmail.com>
+#     Network printing / IPP /PDF /PostScript consultant Linux/Unix/Windows/Samba/CUPS
+#
+# License: MIT, GNU GPLv2 or GPLv3 (your choice)
+# Warranty: None at all; you may need to fix included defects on your own.
+#
+
+filter=${0}
+jobid=${1}
+cupsuser=${2}
+jobtitle=${3}
+copies=${4}
+joboptions=${5}
+jobfile=${6}
+printtime=$(date +%Y-%b-%d-%H-%M-%S)
+
+case ${#} in
+      5)
+         # Input needs to be read from stdin.
+         # Store in file temporarily:
+         _input=$(mktemp -t kp-banner.XXXXXX)
+         cat - > ${_input}
+         ;;
+      6)
+         _input="${6}"
+         ;;
+      0|1|2|3|4|*)
+         # These cases are wrong usage, unsupported and trigger a usage hint:
+         echo " "
+         echo " Usage: ${0} job-id user title copies options [file]"
+         echo " "
+         echo " (Install ${0} as CUPS filter in /usr/lib/cups/filter/$( basename ${0} ).)"
+         exit 1
+esac
+
+unset _header _footer _background _stamp _images _notices _shows
+
+_header=$( grep "^Header " ${_input} | sed 's#^Header##' )
+_footer=$( grep "^Footer " ${_input} | sed 's#^Footer##' )
+_background=$( grep "^Background " ${_input} | sed 's#^Background##' )
+_stamp=$( grep "^Stamp " ${_input} | sed 's#^Stamp##' )
+_images=$( grep "^Image " ${_input} | sed 's#^Image##' )
+_notices=$( grep "^Notice " ${_input} | sed 's#^Notice##' )
+_shows=$( grep "^Show " ${_input} | sed 's#^Show##' )
+
+function stringinstring()
+{
+    case x"$2" in
+        x*${1}*)
+            return 0
+        ;;
+    esac;
+    return 1
+}
+
+
+echo "$_header"
+echo "$_footer"
+echo "$_background"
+echo "$_stamp"
+echo "$_notices"
+echo "$_images"
+echo "$_shows"
+
+
+_tmphtml=$(mktemp -t kp-banner-html.XXXXXXX)
+
+echo '<html><head></head><body>'                            >> $_tmphtml
+
+if [ "x$_header" != "x" ] ; then echo "<h1>$_header</h1>"   >> $_tmphtml
+fi
+
+echo "<table><tbody>"                                       >> $_tmphtml
+echo "<p></p>"                                              >> $_tmphtml
+
+if stringinstring job-name "$_shows" ; then
+        echo "<tr valign='top' class='odd'><td style='text-align: right;'>job-name: </td> <td style:'text-align: left;'> ${jobtitle} </td> </tr>"                   >> $_tmphtml
+fi
+
+if stringinstring copies "$_shows" ; then
+        echo "<tr valign='top' class='even'><td style='text-align: right;'>copies-requested: </td> <td style:'text-align: left;'> ${copies} </td> </tr>"            >> $_tmphtml
+fi
+
+if stringinstring job-id "$_shows" ; then
+        echo "<tr valign='top' class='even'><td style='text-align: right;'>job-id: </td> <td style:'text-align: left;'> ${jobid} </td> </tr>"                       >> $_tmphtml
+fi
+
+if stringinstring job-originating-user-name "$_shows" ; then
+        echo "<tr valign='top' class='odd'><td style='text-align: right;'>job-originating-user-name: </td> <td style:'text-align: left;'> ${cupsuser} </td> </tr>"  >> $_tmphtml
+fi
+
+if stringinstring options "$_shows" ; then
+        _options="$(echo ${5} | sed 's# #<br>#g' | sort)"
+        echo
+        echo
+        echo options="$_options"
+        echo
+        echo
+        echo "<tr valign='top' class='even'><td style='text-align: right;'>job-options: </td> <td style:'text-align: left;'> $_options </td> </tr>"                 >> $_tmphtml
+fi
+
+echo "</table></tbody>"                                     >> $_tmphtml
+
+echo "$_notices" | while read line; do
+     echo "<p>$line</p>"                                    >> $_tmphtml
+done
+
+if [ "x$_images" != "x" ] ; then echo "$_images" | while read line ; do
+        echo "<img src=\"$line\" width=\"35%\">"            >> $_tmphtml
+        done
+fi
+
+if [ "x$_footer" != "x" ] ; then echo "<h1>$_footer</h1>"   >> $_tmphtml
+fi
+
+
+echo "</body></html>"                                       >> $_tmphtml
+
+xdg-open $_tmphtml
+
+# Convert using Pandoc
+pandoc -f html -o ${_tmphtml}-pandoc.pdf ${_tmphtml} -V geometry:"paperheight=842pt, paperwidth=595pt, margin=24pt"
+
+# Convert using HTMLdoc ...
+#htmldoc --webpage -f ${_tmphtml}-htmldoc.pdf --bodycolor '#efefef' --bodyfont Serif --bottom 4mm --top 4mm  --right 4mm --left 4mm --charset utf-8 --embedfonts --color --fontsize 9 --footer .D. --headfootsize 30 --headingfont Arial --no-title  ${_tmphtml}
+htmldoc --webpage -f ${_tmphtml}-htmldoc.pdf ${_tmphtml}
+
+xdg-open ${_tmphtml}-pandoc.pdf
+xdg-open ${_tmphtml}-htmldoc.pdf
+
+
+echo
+echo
+echo DEBUGGING output...  2>&1
+
+echo
+echo $_tmphtml  2>&1
+echo
+
+echo
+cat $_tmphtml  2>&1
+echo
+
+echo
+echo "$_notices"  2>&1
+echo
+
+echo
+echo "$_images"  2>&1
+
+
