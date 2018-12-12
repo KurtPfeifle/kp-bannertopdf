@@ -1,0 +1,48 @@
+#CUPS-BANNER
+#KP-BANNER
+
+# This file currently serves as an example as well as a reference for a more detailed specification of its format in the future.
+# In any case: we will try to support all the keywords CUPS' banner format supports, and some more!
+
+# What to show on the cover page (multiple such lines allowed):
+Show job-id job-name job-originating-user-name
+Show time-at-creation options
+# Other potentially interesting items:   time-at-creation time-at-processing final-content-type
+#                                        imageable-area job-billing job-originating-host-name
+#                                        job-uuid paper-name paper-size printer-driver-name
+#                                        printer-driver-version printer-info printer-location
+#                                        printer-make-and-model printer-name cups-file-type
+#                                        software cups-server copies
+
+# Header text (only one such line allowed):
+Header Cover Page Header
+
+# Footer text (only one such line allowed):
+Footer Cover Page Footer
+
+# Arbitrary "notice" text (multiple such lines allowed):
+Notice This is the first paragraph. It may contain many sentences. If you write too much, space on the banner page will not suffice. Text will overflow. But that's YOUR problem.
+Notice Second paragraph is here.
+Notice We also support a third para.
+Notice And even more, if you want....
+
+# PDF file to use as background of the cover page (only one such line allowed):
+Background /usr/share/cups/banner/background.pdf
+
+# PDF file to use as stamp of the cover page (only one such line allowed):
+Stamp /usr/share/cups/banner/stamp.pdf
+
+# What to show on the cover page
+Show job-id job-name job-originating-user-name
+Show time-at-creation options
+# Other potentially interesting items:   time-at-creation time-at-processing final-content-type
+#                                        imageable-area job-billing job-originating-host-name
+#                                        job-uuid paper-name paper-size printer-driver-name
+#                                        printer-driver-version printer-info printer-location
+#                                        printer-make-and-model printer-name cups-file-type
+#                                        software cups-server
+
+# Images to place below the rest:
+Image /usr/share/cups/doc-root/images/cups-icon.png
+Image /usr/share/cups/doc-root/images/smiley.jpg
+
