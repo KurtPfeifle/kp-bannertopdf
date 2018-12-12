@@ -6,7 +6,7 @@
 
 # What to show on the cover page (multiple such lines allowed):
 Show job-id job-name job-originating-user-name
-Show time-at-creation options
+Show copies time-at-creation options
 # Other potentially interesting items:   time-at-creation time-at-processing final-content-type
 #                                        imageable-area job-billing job-originating-host-name
 #                                        job-uuid paper-name paper-size printer-driver-name
