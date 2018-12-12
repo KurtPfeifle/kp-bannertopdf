@@ -75,7 +75,6 @@ if [ "x$_header" != "x" ] ; then echo "<h1>$_header</h1>"   >> $_tmphtml
 fi
 
 echo "<table><tbody>"                                       >> $_tmphtml
-echo "<p></p>"                                              >> $_tmphtml
 
 if stringinstring job-name "$_shows" ; then
         echo "<tr valign='top' class='odd'><td style='text-align: right;'>job-name: </td> <td style:'text-align: left;'> ${jobtitle} </td> </tr>"                   >> $_tmphtml
@@ -104,6 +103,7 @@ if stringinstring options "$_shows" ; then
 fi
 
 echo "</table></tbody>"                                     >> $_tmphtml
+echo "<p></p>"                                              >> $_tmphtml
 
 echo "$_notices" | while read line; do
      echo "<p>$line</p>"                                    >> $_tmphtml
